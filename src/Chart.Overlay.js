@@ -6,7 +6,7 @@
         helpers = Chart.helpers;
     //Overlay is a extention of the bar graph to allow the combination
     //of both line and bar charts on the same graph.
-    //this graph extends the bar graph as the bar graphs scale is used due to
+    //this graph extends the bar graph as the bar graphs scale is used due to 
     //it needing to detrmine x axis label width.
     Chart.types.Bar.extend({
         name: "Overlay",
@@ -102,7 +102,6 @@
                     pointColor: dataset.pointColor,
                     pointStrokeColor: dataset.pointStrokeColor,
                     showTooltip: dataset.showTooltip,
-                    dashStyle : dataset.dashStyle,
                     points: []
                 };
 
