@@ -799,7 +799,27 @@
                 ctx.lineTo(x, y + radius);
                 ctx.quadraticCurveTo(x, y, x + radius, y);
                 ctx.closePath();
-            };
+            },
+
+            drawDashedLine = helpers.drawDashedLine = function(ctx,x,y,x2,y2,da) {
+    			       ctx.save();
+    			       var dx = (x2-x), dy = (y2-y);
+    			       var len = Math.sqrt(dx*dx + dy*dy);
+    			       var rot = Math.atan2(dy, dx);
+    			       ctx.translate(x, y);
+    			       ctx.moveTo(0, 0);
+    			       ctx.rotate(rot);
+    			       var dc = da.length;
+    			       var di = 0, draw = true;
+    			       x = 0;
+    			       while (len > x) {
+    				        x += da[di++ % dc];
+    				        if (x > len) x = len;
+    				        draw ? ctx.lineTo(x?x:1, 0) : ctx.moveTo(x, 0);
+    				        draw = !draw;
+    			       }
+    			       ctx.restore();
+     		     };
 
 
         //Store a reference to each instance - allowing us to globally resize chart instances on window resize.
@@ -2008,6 +2028,6 @@
         Chart.noConflict = function() {
             root.Chart = previous;
             return Chart;
-        }; 
+        };
 
 }).call(this);

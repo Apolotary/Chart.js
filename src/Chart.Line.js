@@ -6,7 +6,7 @@
         helpers = Chart.helpers;
 
     var defaultConfig = {
-        //Function - Whether the current x-axis label should be filtered out, takes in current label and 
+        //Function - Whether the current x-axis label should be filtered out, takes in current label and
         //index, return true to filter out the label return false to keep the label
         labelsFilter: function(label, index) {
             return false;
@@ -56,6 +56,8 @@
 
         //Boolean - Whetther to try and fill sparse datasets to keep one consecutive line
         populateSparseData: false,
+
+        dashStyle = [0,0],
 
         //Number - length of labels being displayed on graph, 0 represents full length
         labelLength: 0,
@@ -133,6 +135,7 @@
                     pointColor: dataset.pointColor,
                     pointStrokeColor: dataset.pointStrokeColor,
                     showTooltip: dataset.showTooltip,
+                    dashStyle : dataset.dashStyle,
                     points: []
                 };
 
@@ -388,7 +391,8 @@
                                     point.x,
                                     point.y
                                 );
-                            } else {
+                            } else if (dataset.dashStyle instanceof Array){
+							                  helpers.drawDashedLine(ctx, dataset.points[index-1].x, dataset.points[index-1].y, point.x, point.y, dataset.dashStyle);else {
                                 ctx.moveTo(point.x, point.y);
                             }
                         } else {

@@ -799,7 +799,27 @@
                 ctx.lineTo(x, y + radius);
                 ctx.quadraticCurveTo(x, y, x + radius, y);
                 ctx.closePath();
-            };
+            },
+
+            drawDashedLine = helpers.drawDashedLine = function(ctx,x,y,x2,y2,da) {
+    			       ctx.save();
+    			       var dx = (x2-x), dy = (y2-y);
+    			       var len = Math.sqrt(dx*dx + dy*dy);
+    			       var rot = Math.atan2(dy, dx);
+    			       ctx.translate(x, y);
+    			       ctx.moveTo(0, 0);
+    			       ctx.rotate(rot);
+    			       var dc = da.length;
+    			       var di = 0, draw = true;
+    			       x = 0;
+    			       while (len > x) {
+    				        x += da[di++ % dc];
+    				        if (x > len) x = len;
+    				        draw ? ctx.lineTo(x?x:1, 0) : ctx.moveTo(x, 0);
+    				        draw = !draw;
+    			       }
+    			       ctx.restore();
+     		     };
 
 
         //Store a reference to each instance - allowing us to globally resize chart instances on window resize.
@@ -1264,7 +1284,7 @@
                 return this.base - this.y;
             },
             inRange: function(chartX, chartY) {
-                return (chartX >= this.x - this.width / 2 && chartX <= this.x + this.width / 2) && (chartY >= this.y && (chartY <= this.base || chartY > this.base));
+                return (chartX >= this.x - this.width / 2 && chartX <= this.x + this.width / 2) && chartY >= this.y;
             }
         });
 
@@ -2008,7 +2028,7 @@
         Chart.noConflict = function() {
             root.Chart = previous;
             return Chart;
-        }; 
+        };
 
 }).call(this);
 
@@ -2607,7 +2627,7 @@
         helpers = Chart.helpers;
 
     var defaultConfig = {
-        //Function - Whether the current x-axis label should be filtered out, takes in current label and 
+        //Function - Whether the current x-axis label should be filtered out, takes in current label and
         //index, return true to filter out the label return false to keep the label
         labelsFilter: function(label, index) {
             return false;
@@ -2657,6 +2677,8 @@
 
         //Boolean - Whetther to try and fill sparse datasets to keep one consecutive line
         populateSparseData: false,
+
+        dashStyle = [0,0],
 
         //Number - length of labels being displayed on graph, 0 represents full length
         labelLength: 0,
@@ -2734,6 +2756,7 @@
                     pointColor: dataset.pointColor,
                     pointStrokeColor: dataset.pointStrokeColor,
                     showTooltip: dataset.showTooltip,
+                    dashStyle : dataset.dashStyle,
                     points: []
                 };
 
@@ -2989,7 +3012,8 @@
                                     point.x,
                                     point.y
                                 );
-                            } else {
+                            } else if (dataset.dashStyle instanceof Array){
+							                  helpers.drawDashedLine(ctx, dataset.points[index-1].x, dataset.points[index-1].y, point.x, point.y, dataset.dashStyle);else {
                                 ctx.moveTo(point.x, point.y);
                             }
                         } else {
@@ -3112,7 +3136,7 @@
         helpers = Chart.helpers;
     //Overlay is a extention of the bar graph to allow the combination
     //of both line and bar charts on the same graph.
-    //this graph extends the bar graph as the bar graphs scale is used due to 
+    //this graph extends the bar graph as the bar graphs scale is used due to
     //it needing to detrmine x axis label width.
     Chart.types.Bar.extend({
         name: "Overlay",
@@ -3208,6 +3232,7 @@
                     pointColor: dataset.pointColor,
                     pointStrokeColor: dataset.pointStrokeColor,
                     showTooltip: dataset.showTooltip,
+                    dashStyle : dataset.dashStyle,
                     points: []
                 };
 
